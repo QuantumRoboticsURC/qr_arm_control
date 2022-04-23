@@ -35,6 +35,18 @@ class ArmTeleop:
             "joint6": 0
         }
 
+        self.l1 = 0
+        self.l2 = 2.1
+        self.l3 = 2.1
+        self.l4 = 1
+        self.limits_map = {
+            "q1":(0,90),
+            "q2":(0,170),
+            "q3":(-90,0),
+            "q4":(-90,90)
+        }
+        self.limit_z = -3
+
         ### Initialize graph interface
         self.ArmControlWindow = Tk()
         self.ArmControlWindow.title("Arm Teleop")
@@ -104,31 +116,74 @@ class ArmTeleop:
         photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "jasldjfalsdjfljdflafd")
-        self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")
-        """self.imag = Button(self.root, width = 1, image = )
-        exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
-        exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
-        exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')"""
+        self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")        
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
 
-    def buttonsSection1(self, joint, row, col, desc, val=".2"):
-        exec('self.S1labelj' + str(joint) + ' = Label(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=LEFT, anchor=W)')
-        exec('self.S1labelj' + str(joint) + '.config(text=" ' +desc + ':")')
-        exec('self.S1labelj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col) + ', columnspan=1, sticky="nsew")')        
+    def ikine_brazo(self, xm, ym, zm, phi_int):        
+        if (xm != 0 or ym != 0 or zm != 0):
+            if(xm == 0):
+                if(ym>0):
+                    xm = ym
+                    Q1 = math.pi/2
+                elif ym<0:
+                    xm = ym
+                    Q1 = -math.pi/2
+                elif ym == 0:
+                    Q1 = 0
+            elif (xm < 0):
+                if (ym == 0):
+                    Q1 = 0
+                elif ym<0:
+                    Q1 = numpy.real(math.atan2(xm, ym))#real
+                else:
+                    Q1 = numpy.real(math.atan2(-xm,-ym))#real
+            else:
+                Q1 = numpy.real(math.atan2(ym,xm))#real
+        #Para q1
+        q1=numpy.rad2deg(Q1)
+        q1=self.qlimit(self.limits_map["q1"],q1)
+        #Para q2      
+        hip=math.sqrt(xm**2+(zm-self.l1)**2)
+        phi = math.atan2(zm-self.l1, xm)
+        beta=cmath.acos((-self.l3**2+self.l2**2+hip**2)/(2*self.l2*hip))
+        Q2=numpy.real(phi+beta)        
+        q2=numpy.rad2deg(Q2) 
+        q2=self.qlimit(self.limits_map["q2"],q2)
+        #Para q3
+        gamma=cmath.acos((self.l2**2+self.l3**2-hip**2)/(2*self.l2*self.l3))        
+        Q3=numpy.real(gamma-math.pi)        
+        q3=numpy.rad2deg(Q3)
+        q3=self.qlimit(self.limits_map["q3"],q3)
+        q4 = phi_int - q2 -q3  
+        q4=self.qlimit(self.limits_map["q4"],q4)            
+        
+        acum = math.radians(q2)
+        x2 = self.l2*math.cos(acum) 
+        y2 = self.l2*math.sin(acum)        
+        acum+=math.radians(q3)
+        x3 = x2+self.l3*math.cos(acum)
+        y3 = y2+self.l3*math.sin(acum)
+        acum+=math.radians(q4)
+        x4 = x3+self.l4*math.cos(acum) 
+        y4 = y3+self.l4*math.sin(acum)
+        self.values_map["joint1"] = x3
+        self.values_map["joint3"] = y3
+        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)+" "+str(x4)+" "+str(y4)
+        rospy.loginfo(txt)
+        if(y4 > self.limit_z):
+            self.pub_q1.publish(q1)
+            self.pub_q2.publish(q2)
+            self.pub_q3.publish(q3)
+            self.pub_q4.publish(q4)
 
-        exec('self.S1buttonj' + str(joint) + 'w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
-        exec('self.S1buttonj' + str(joint) + 'w.config(text="-")')
-        exec('self.S1buttonj' + str(joint) + 'w.grid(row=' + str(row) + ', column=' + str(col+1) + ', columnspan=1, sticky="nsew")')
+    def qlimit(self, l, val):
+        if (val < l[0]):
+            return l[0]
+        if (val > l[1]):
+            return l[1]
+        return val     
 
-        exec('self.S1velj' + str(joint) + ' = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)')
-        exec('self.S1velj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col+2) + ', columnspan=1, sticky="nsew")')
-        exec('self.S1velj' + str(joint) + '.insert(0, '+val+')')
-
-        exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
-        exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
-        exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')
-        	
     def pressed(self, data, joint, sign = 1):        
         
         #self.lock_drive_teleop()
@@ -178,7 +233,25 @@ class ArmTeleop:
         
         ### phase of unlock_drive_teleop and enable on_joy
         #self.unlock_drive_teleop()
-        #time.sleep(.1)
+        #time.sleep(.1)   
+
+    def buttonsSection1(self, joint, row, col, desc, val=".2"):
+        #exec('self.S1labelj' + str(joint) + ' = Label(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER, anchor=W)')
+        exec('self.S1labelj' + str(joint) + ' = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)')
+        exec('self.S1labelj' + str(joint) + '.config(text=" ' +desc + ':")')
+        exec('self.S1labelj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col) + ', columnspan=1, sticky="nsew")')        
+
+        exec('self.S1buttonj' + str(joint) + 'w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
+        exec('self.S1buttonj' + str(joint) + 'w.config(text="-")')
+        exec('self.S1buttonj' + str(joint) + 'w.grid(row=' + str(row) + ', column=' + str(col+1) + ', columnspan=1, sticky="nsew")')
+
+        exec('self.S1velj' + str(joint) + ' = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)')
+        exec('self.S1velj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col+2) + ', columnspan=1, sticky="nsew")')
+        exec('self.S1velj' + str(joint) + '.insert(0, '+val+')')
+
+        exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
+        exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
+        exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')        	
 
     def unpressed(self):
         self.S1labelj3.config(bg="white")
@@ -188,72 +261,6 @@ class ArmTeleop:
         self.S1labelj4.config(bg="white")
         self.S1labelj5.config(bg="white")
         self.S1labelj6.config(bg="white")  
-
-    def ikine_brazo(self, xm, ym, zm, phi_int):
-        l1 = 0
-        l2 = 2.1
-        l3 = 2.1
-        l4 = 1
-        limit = -3
-        if (xm != 0 or ym != 0 or zm != 0):
-            if(xm == 0):
-                if(ym>0):
-                    xm = ym
-                    Q1 = math.pi/2
-                elif ym<0:
-                    xm = ym
-                    Q1 = -math.pi/2
-                elif ym == 0:
-                    Q1 = 0
-            elif (xm < 0):
-                if (ym == 0):
-                    Q1 = 0
-                elif ym<0:
-                    Q1 = numpy.real(math.atan2(xm, ym))#real
-                else:
-                    Q1 = numpy.real(math.atan2(-xm,-ym))#real
-            else:
-                Q1 = numpy.real(math.atan2(ym,xm))#real
-        #Para q1
-        q1=numpy.rad2deg(Q1)
-        #Para q2      
-        hip=math.sqrt(xm**2+(zm-l1)**2)
-        phi = math.atan2(zm-l1, xm)
-        beta=cmath.acos((-l3**2+l2**2+hip**2)/(2*l2*hip))
-        Q2=numpy.real(phi+beta)        
-        q2=numpy.rad2deg(Q2) 
-        #Para q3
-        gamma=cmath.acos((l2**2+l3**2-hip**2)/(2*l2*l3))        
-        Q3=numpy.real(gamma-math.pi)        
-        q3=numpy.rad2deg(Q3)
-        q4 = phi_int - q2 -q3              
-        
-        
-        acum = math.radians(q2)
-        x2 = l2*math.cos(acum) 
-        y2 = l2*math.sin(acum)
-        acum+=math.radians(q3)
-        x3 = x2+l3*math.cos(acum)
-        y3 = y2+l3*math.sin(acum)
-        acum+=math.radians(q4)
-        x4 = x3+l4*math.cos(acum) 
-        y4 = y3+l4*math.sin(acum)
-        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)+" "+str(x4)+" "+str(y4)
-        rospy.loginfo(txt)
-        if(y4 > limit):
-            self.pub_q1.publish(q1)
-            self.pub_q2.publish(q2)
-            self.pub_q3.publish(q3)
-            self.pub_q4.publish(q4)            
-
-
-
-    def qlimit(self, li, ls, val):
-        if (val < li):
-            return li
-        if (val > ls):
-            return ls
-        return val        
 
 if __name__ == '__main__':
     try:

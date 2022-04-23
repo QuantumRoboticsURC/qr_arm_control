@@ -22,7 +22,6 @@ q = {
 }
         
 def plotAgain():
-    print(math.cos(math.radians(q["q1"])))
     #x1 = l1*math.cos(math.radians(q["q1"]))
     #y1 = l1*math.sin(math.radians(q["q1"]))    
     #plt.show()
