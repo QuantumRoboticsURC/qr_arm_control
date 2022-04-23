@@ -12,7 +12,7 @@ from std_msgs.msg import *
 from geometry_msgs.msg import Twist
 import math
 import numpy
-
+import cmath
 
 class ArmTeleop:
     def __init__(self):        
@@ -27,8 +27,8 @@ class ArmTeleop:
         self.joint5_position = 321        
 
         self.values_map = {
-            "joint1": 0.25,
-            "joint2": 0,
+            "joint1": 4.2,#.4
+            "joint2": 0,#.9
             "joint3": 0,
             "joint4": 0,
             "joint5": 0,
@@ -75,7 +75,7 @@ class ArmTeleop:
         self.S1buttonj3w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj3c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        self.buttonsSection1(4, 7, 0,"Phi")
+        self.buttonsSection1(4, 7, 0,"Phi", "5")
         self.S1buttonj4c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj4.get()) , 4),-1)
         self.S1buttonj4w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj4.get()) , 4))
         self.S1buttonj4w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
@@ -101,14 +101,7 @@ class ArmTeleop:
         self.labelInfo.config(text=txt)
         self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
 
-        """self.im = Label(self.root, image = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/test.jpeg")))
-        self.im.grid(row=11, column=0, columnspan=4, sticky="nsew")
-
-        self.LabelOtro = Label(root, text = 'Position image on button', font =('<font_name>', <font_size>)).pack(side = TOP)"""
-        """photo = PhotoImage(file = "/home/arihc/catkin_ws/src/qr_arm_control/scripts/test.jpeg")
-        photoImage = photo.subsample(1,2)"""
-        #self.otherButton = Button(self.root, image = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/test.jpeg")))
-        photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/test.jpeg"))
+        photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "jasldjfalsdjfljdflafd")
         self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")
@@ -119,7 +112,7 @@ class ArmTeleop:
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
 
-    def buttonsSection1(self, joint, row, col, desc):
+    def buttonsSection1(self, joint, row, col, desc, val=".2"):
         exec('self.S1labelj' + str(joint) + ' = Label(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=LEFT, anchor=W)')
         exec('self.S1labelj' + str(joint) + '.config(text=" ' +desc + ':")')
         exec('self.S1labelj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col) + ', columnspan=1, sticky="nsew")')        
@@ -130,7 +123,7 @@ class ArmTeleop:
 
         exec('self.S1velj' + str(joint) + ' = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)')
         exec('self.S1velj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col+2) + ', columnspan=1, sticky="nsew")')
-        exec('self.S1velj' + str(joint) + '.insert(0, "0.2")')
+        exec('self.S1velj' + str(joint) + '.insert(0, '+val+')')
 
         exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")')
         exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
@@ -196,47 +189,71 @@ class ArmTeleop:
         self.S1labelj5.config(bg="white")
         self.S1labelj6.config(bg="white")  
 
-    def ikine_brazo(self, xm, ym, zm, phi):
-        l1 = 0.11329
-        l2 = .21
-        l3 = .21
-        #Para q1
-        Q1 = 50
-        if(xm == 0):
-            if(ym>0):
-                xm = ym
-                Q1 = math.pi/2
-            elif ym<0:
-                xm = ym
-                Q1 = -math.pi/2
-        elif (xm < 0):
-            if (ym == 0):
-                Q1 = math.pi
-                xm = -xm
-            elif ym<0:
-                Q1 = math.atan2(xm, ym)
+    def ikine_brazo(self, xm, ym, zm, phi_int):
+        l1 = 0
+        l2 = 2.1
+        l3 = 2.1
+        l4 = 1
+        limit = -3
+        if (xm != 0 or ym != 0 or zm != 0):
+            if(xm == 0):
+                if(ym>0):
+                    xm = ym
+                    Q1 = math.pi/2
+                elif ym<0:
+                    xm = ym
+                    Q1 = -math.pi/2
+                elif ym == 0:
+                    Q1 = 0
+            elif (xm < 0):
+                if (ym == 0):
+                    Q1 = 0
+                elif ym<0:
+                    Q1 = numpy.real(math.atan2(xm, ym))#real
+                else:
+                    Q1 = numpy.real(math.atan2(-xm,-ym))#real
             else:
-                Q1 = math.atan2(-xm,-ym)
-        else:
-            Q1 = math.atan2(ym,xm)
+                Q1 = numpy.real(math.atan2(ym,xm))#real
+        #Para q1
         q1=numpy.rad2deg(Q1)
-        #Para q2     
+        #Para q2      
         hip=math.sqrt(xm**2+(zm-l1)**2)
-        delta=math.atan2(zm-l1,xm)
-        beta=math.acos((-l3**2+l2**2+hip**2)/(2*l2*hip))
-        Q2=delta+beta
+        phi = math.atan2(zm-l1, xm)
+        beta=cmath.acos((-l3**2+l2**2+hip**2)/(2*l2*hip))
+        Q2=numpy.real(phi+beta)        
         q2=numpy.rad2deg(Q2) 
         #Para q3
-        gamma=math.acos((l2**2+l3**2-hip**2)/(2*l2*l3))
-        Q3=gamma-math.pi
+        gamma=cmath.acos((l2**2+l3**2-hip**2)/(2*l2*l3))        
+        Q3=numpy.real(gamma-math.pi)        
         q3=numpy.rad2deg(Q3)
-        q4 = phi - q2 -q3        
-        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)+" "
-        self.pub_q1.publish(q1)
-        self.pub_q2.publish(q2)
-        self.pub_q3.publish(q3)
-        self.pub_q4.publish(q4)    
+        q4 = phi_int - q2 -q3              
+        
+        
+        acum = math.radians(q2)
+        x2 = l2*math.cos(acum) 
+        y2 = l2*math.sin(acum)
+        acum+=math.radians(q3)
+        x3 = x2+l3*math.cos(acum)
+        y3 = y2+l3*math.sin(acum)
+        acum+=math.radians(q4)
+        x4 = x3+l4*math.cos(acum) 
+        y4 = y3+l4*math.sin(acum)
+        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)+" "+str(x4)+" "+str(y4)
         rospy.loginfo(txt)
+        if(y4 > limit):
+            self.pub_q1.publish(q1)
+            self.pub_q2.publish(q2)
+            self.pub_q3.publish(q3)
+            self.pub_q4.publish(q4)            
+
+
+
+    def qlimit(self, li, ls, val):
+        if (val < li):
+            return li
+        if (val > ls):
+            return ls
+        return val        
 
 if __name__ == '__main__':
     try:
