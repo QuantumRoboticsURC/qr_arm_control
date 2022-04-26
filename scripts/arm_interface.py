@@ -113,9 +113,9 @@ class ArmTeleop:
         self.labelInfo.config(text=txt)
         self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
 
-        photo = ImageTk.PhotoImage(Image.open("qr_arm.png"))
+        photo = ImageTk.PhotoImage(Image.open("scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
-        #self.otherButton.config(text = "jasldjfalsdjfljdflafd")
+        self.otherButton.config(text = "jasldjfalsdjfljdflafd")
         self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")        
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
