@@ -10,9 +10,9 @@ import time
 x0 = 0
 y0 = 0
 l1 = 0
-l2 = 2.1
-l3 = 2.1
-l4 = 1
+l2 = 2.6
+l3 = 2.6
+l4 = .9
 
 q = {
     'q1':90, 
@@ -22,12 +22,13 @@ q = {
 }
         
 def plotAgain():
+    print(q["q1"],q["q2"],q["q3"],q["q4"])
     #x1 = l1*math.cos(math.radians(q["q1"]))
     #y1 = l1*math.sin(math.radians(q["q1"]))    
     #plt.show()
     acum = math.radians(q["q2"])
     x2 = l2*math.cos(acum) 
-    y2 = l2*math.sin(math.radians(q["q2"]))
+    y2 = l2*math.sin(acum)
 
     acum+=math.radians(q["q3"])
     x3 = x2+l3*math.cos(acum)
@@ -42,15 +43,15 @@ def plotAgain():
     plt.plot([x0,x2], [y0,y2])
     plt.plot([x2,x3], [y2,y3])
     plt.plot([x3,x4], [y3,y4])
-    plt.axis([-6,6, -6,6])
+    plt.plot([-7,7], [-4.2,-4.2])
+    plt.axis([-7.0,7.0, -7.0,7.0])
     plt.grid()
     plt.draw()
     plt.pause(0.00000000001)
     #rospy.loginfo()
 
 def doQ1(msg):
-    q["q1"] = msg.data
-    plotAgain()
+    q["q1"] = msg.data    
         
 def doQ2(msg):
     q["q2"] = msg.data
@@ -60,6 +61,7 @@ def doQ3(msg):
 
 def doQ4(msg):
     q["q4"] = msg.data
+    plotAgain()
 
 
 rospy.init_node('arm_inverse_kinematics')

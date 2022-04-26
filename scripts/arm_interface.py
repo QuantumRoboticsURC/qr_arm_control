@@ -36,17 +36,19 @@ class ArmTeleop:
         }
 
         self.l1 = 0
-        self.l2 = 2.1
-        self.l3 = 2.1
-        self.l4 = 1
+        self.l2 = 2.6
+        self.l3 = 2.6
+        self.l4 = .9
+        
         self.limits_map = {
-            "q1":(0,90),
+            "q1":(-90,90),
             "q2":(0,170),
-            "q3":(-90,0),
+            "q3":(-135,90),
             "q4":(-90,90)
         }
         self.limit_z = -3
-
+        #11cm del chasis
+        
         ### Initialize graph interface
         self.ArmControlWindow = Tk()
         self.ArmControlWindow.title("Arm Teleop")
@@ -113,7 +115,7 @@ class ArmTeleop:
         self.labelInfo.config(text=txt)
         self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
 
-        photo = ImageTk.PhotoImage(Image.open("scripts/qr_arm.png"))
+        photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "jasldjfalsdjfljdflafd")
         self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")        
