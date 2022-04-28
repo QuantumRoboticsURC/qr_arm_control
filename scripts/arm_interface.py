@@ -28,9 +28,9 @@ class ArmTeleop:
         self.joint5_position = 321        
 
         self.values_map = {
-            "joint1": 5.2,#.4
+            "joint1": .18,#.4
             "joint2": 0,#.9
-            "joint3": 0,
+            "joint3": .66,
             "joint4": 0,
             "joint5": 0,
             "joint6": 0
@@ -43,16 +43,16 @@ class ArmTeleop:
 
         self.limits_map = {
             "q1":(-90,90),
-            "q2":(0,170),
-            "q3":(-135,90),
+            "q2":(0,157),
+            "q3":(-165,0),
             "q4":(-90,90)
         }
 
         self.angles_map={
             "q1":0,
-            "q2":0,
-            "q3":0,#
-            "q4":0
+            "q2":157.36,
+            "q3":-164.99,#
+            "q4":8
         }
         self.limit_z = -3
         self.limit_chassis = 1.1
@@ -220,7 +220,7 @@ class ArmTeleop:
         key = "joint"+str(joint)
         self.values_map[key]+=(data*(sign*-1))    
         if(joint < 5):
-            poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
+            poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
                 self.values_map[key]+=(data*(sign))
         if(joint == 1):       
