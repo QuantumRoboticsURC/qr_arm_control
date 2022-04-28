@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import Float64
+from std_msgs.msg import String
 
 import numpy as np
 import math
@@ -51,24 +52,16 @@ def plotAgain():
     #rospy.loginfo()
 
 def doQ1(msg):
-    q["q1"] = msg.data    
-        
-def doQ2(msg):
-    q["q2"] = msg.data
-
-def doQ3(msg):
-    q["q3"] = msg.data
-
-def doQ4(msg):
-    q["q4"] = msg.data
+    qs = msg.data.split(" ")
+    q["q1"] = float(qs[0])
+    q["q2"] = float(qs[1])
+    q["q3"] = float(qs[2])
+    q["q4"] = float(qs[3])    
     plotAgain()
 
 
 rospy.init_node('arm_inverse_kinematics')
-sub = rospy.Subscriber ('/inverse_kinematics/q1', Float64, doQ1)
-sub = rospy.Subscriber ('/inverse_kinematics/q2', Float64, doQ2)
-sub = rospy.Subscriber ('/inverse_kinematics/q3', Float64, doQ3)
-sub = rospy.Subscriber ('/inverse_kinematics/q4', Float64, doQ4)
+sub = rospy.Subscriber ('/inverse_kinematics/Q', String, doQ1)
 plt.show()
 #plotAgain()
 rospy.spin()

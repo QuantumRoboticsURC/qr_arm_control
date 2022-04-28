@@ -21,13 +21,14 @@ class ArmTeleop:
         self.pub_q2 = rospy.Publisher('inverse_kinematics/q2', Float64, queue_size=1)
         self.pub_q3 = rospy.Publisher('inverse_kinematics/q3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('inverse_kinematics/q4', Float64, queue_size=1)
+        self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
         self.joint5 = rospy.Publisher('arm_teleop/rotacion_gripper', Int32, queue_size=1)
         self.gripper = rospy.Publisher('arm_teleop/apertura_gripper', Int32, queue_size=1)
         self.gripper_apertur = 100
         self.joint5_position = 321        
 
         self.values_map = {
-            "joint1": 4.2,#.4
+            "joint1": 5.2,#.4
             "joint2": 0,#.9
             "joint3": 0,
             "joint4": 0,
@@ -39,14 +40,22 @@ class ArmTeleop:
         self.l2 = 2.6
         self.l3 = 2.6
         self.l4 = .9
-        
+
         self.limits_map = {
             "q1":(-90,90),
             "q2":(0,170),
             "q3":(-135,90),
             "q4":(-90,90)
         }
+
+        self.angles_map={
+            "q1":0,
+            "q2":0,
+            "q3":0,#
+            "q4":0
+        }
         self.limit_z = -3
+        self.limit_chassis = 1.1
         #11cm del chasis
         
         ### Initialize graph interface
@@ -107,18 +116,17 @@ class ArmTeleop:
         self.S1buttonj6w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj6c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
         
-        
-        txt = "Position X = "+str(self.values_map["joint1"])+"\n" + "Position Y = "+str(self.values_map["joint2"])+"\n"+"Position Z = "+str(self.values_map["joint3"])+"\n"
-        txt+="Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
-        txt+="Apertura del Gripper = "+str(self.values_map["joint6"])
+                
+
         self.labelInfo = Label(self.root, font=("Consolas", 10), width=36, bg="white", bd=0, justify=LEFT)
-        self.labelInfo.config(text=txt)
+        self.labelInfo.config(text=self.getTxt())
         self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
 
         photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
-        self.otherButton.config(text = "jasldjfalsdjfljdflafd")
-        self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")        
+        self.otherButton.config(text = "")
+        self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")  
+        self.publish_angles()      
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
 
@@ -167,17 +175,36 @@ class ArmTeleop:
         x3 = x2+self.l3*math.cos(acum)
         y3 = y2+self.l3*math.sin(acum)
         acum+=math.radians(q4)
-        x4 = x3+self.l4*math.cos(acum) 
+        x4 = x3+self.l4*math.cos(acum)
         y4 = y3+self.l4*math.sin(acum)
-        self.values_map["joint1"] = x3
-        self.values_map["joint3"] = y3
-        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)+" "+str(x4)+" "+str(y4)
+
+        if(y4 > self.limit_z and (x4 > self.limit_chassis or y4 >= 0)):
+            self.publish_angles()
+            
+            self.values_map["joint1"] = x3
+            self.values_map["joint3"] = y3
+            
+            self.angles_map["q1"] = q1
+            self.angles_map["q2"] = q2
+            self.angles_map["q3"] = q3
+            self.angles_map["q4"] = q4
+            return True
+        else:
+            return False
+
+    def publish_angles(self):
+        q1 = self.angles_map["q1"]
+        q2 = self.angles_map["q2"]
+        q3 = self.angles_map["q3"]
+        q4 = self.angles_map["q4"]
+
+        txt = str(q1)+" "+str(q2)+" "+str(q3)+" "+str(q4)
         rospy.loginfo(txt)
-        if(y4 > self.limit_z):
-            self.pub_q1.publish(q1)
-            self.pub_q2.publish(q2)
-            self.pub_q3.publish(q3)
-            self.pub_q4.publish(q4)
+        self.pub_q1.publish(q1)
+        self.pub_q2.publish(q2)
+        self.pub_q3.publish(q3)
+        self.pub_q4.publish(q4)
+        self.pub_q_string.publish(txt)
 
     def qlimit(self, l, val):
         if (val < l[0]):
@@ -192,26 +219,26 @@ class ArmTeleop:
         ### phase of send the data of the joints
         key = "joint"+str(joint)
         self.values_map[key]+=(data*(sign*-1))    
+        if(joint < 5):
+            poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
+            if(not poss):
+                self.values_map[key]+=(data*(sign))
         if(joint == 1):       
-            self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
             if(data != 0):
                 self.S1labelj1.config(bg="#34eb61")
             else:
                 self.S1labelj1.config(bg="white")
         elif(joint == 2):
-            self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
             if(data != 0):
                 self.S1labelj2.config(bg="#34eb61")
             else:
                 self.S1labelj2.config(bg="white")
         elif(joint == 3):
-            self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
             if(data != 0):
                 self.S1labelj3.config(bg="#34eb61")
             else:
                 self.S1labelj3.config(bg="white")
-        elif(joint == 4):
-            self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
+        elif(joint == 4):            
             if(data != 0):
                 self.S1labelj4.config(bg="#34eb61")
             else:
@@ -228,10 +255,8 @@ class ArmTeleop:
                 self.S1labelj6.config(bg="#34eb61")
             else:
                 self.S1labelj6.config(bg="white")
-        txt = "Position X = "+str(self.values_map["joint1"])+"\n" + "Position Y = "+str(self.values_map["joint2"])+"\n"+"Position Z = "+str(self.values_map["joint3"])+"\n"
-        txt+="Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
-        txt+="Apertura del Gripper = "+str(self.values_map["joint6"])
-        self.labelInfo.config(text=txt)
+        
+        self.labelInfo.config(text=self.getTxt())
         
         ### phase of unlock_drive_teleop and enable on_joy
         #self.unlock_drive_teleop()
@@ -263,6 +288,14 @@ class ArmTeleop:
         self.S1labelj4.config(bg="white")
         self.S1labelj5.config(bg="white")
         self.S1labelj6.config(bg="white")  
+    
+    def getTxt(self):
+        txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
+        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
+        txt += "Apertura del Gripper = "+str(self.values_map["joint6"])+"\n"
+        txt += "q1:"+str(round(self.angles_map["q1"],2))+" q2:"+str(round(self.angles_map["q2"],2))+"\n"
+        txt += "q3:"+str(round(self.angles_map["q3"],2))+" q4:"+str(round(self.angles_map["q4"],2))
+        return txt
 
 if __name__ == '__main__':
     try:
