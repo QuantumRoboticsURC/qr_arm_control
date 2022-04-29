@@ -17,10 +17,10 @@ import cmath
 class ArmTeleop:
     def __init__(self):        
         ### Initialize the publisher for the joints        
-        self.pub_q1 = rospy.Publisher('inverse_kinematics/q1', Float64, queue_size=1)
-        self.pub_q2 = rospy.Publisher('inverse_kinematics/q2', Float64, queue_size=1)
-        self.pub_q3 = rospy.Publisher('inverse_kinematics/q3', Float64, queue_size=1)
-        self.pub_q4 = rospy.Publisher('inverse_kinematics/q4', Float64, queue_size=1)
+        self.pub_q1 = rospy.Publisher('arm_teleop/joint1', Float64, queue_size=1)
+        self.pub_q2 = rospy.Publisher('arm_teleop/joint2', Float64, queue_size=1)
+        self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
+        self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
         self.joint5 = rospy.Publisher('arm_teleop/rotacion_gripper', Int32, queue_size=1)
         self.gripper = rospy.Publisher('arm_teleop/apertura_gripper', Int32, queue_size=1)
@@ -28,9 +28,9 @@ class ArmTeleop:
         self.joint5_position = 321        
 
         self.values_map = {
-            "joint1": .18,#.4
+            "joint1": .134,#.4
             "joint2": 0,#.9
-            "joint3": .66,
+            "joint3": .647,
             "joint4": 0,
             "joint5": 0,
             "joint6": 0
@@ -43,15 +43,15 @@ class ArmTeleop:
 
         self.limits_map = {
             "q1":(-90,90),
-            "q2":(0,157),
-            "q3":(-165,0),
+            "q2":(0,161),
+            "q3":(-165.4,0),
             "q4":(-90,90)
         }
 
         self.angles_map={
             "q1":0,
-            "q2":157.36,
-            "q3":-164.99,#
+            "q2":161,
+            "q3":-165.4,#
             "q4":8
         }
         self.limit_z = -3
@@ -84,7 +84,7 @@ class ArmTeleop:
         self.S1buttonj1w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj1.get()), 1))        
         self.S1buttonj1c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj1.get()), 1))
         self.S1buttonj1w.bind("<ButtonRelease-1>", lambda event: self.unpressed())
-        self.S1buttonj1c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
+        self.S1buttonj1c.bind("<ButtonRelease-1>", lambda event: self.unpressed())                
 
         self.buttonsSection1(2, 5, 0, "Position Y")
         self.S1buttonj2c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj2.get()), 2),-1)
@@ -98,10 +98,17 @@ class ArmTeleop:
         self.S1buttonj3w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj3c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        self.buttonsSection1(4, 7, 0,"Phi", "5")
-        self.S1buttonj4c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj4.get()) , 4),-1)
-        self.S1buttonj4w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj4.get()) , 4))
-        self.S1buttonj4w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
+        #self.buttonsSection1(4, 7, 0,"Phi", "5")
+        self.S1labelj4 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj4.config(text="Phi")
+        self.S1labelj4.grid(row=7, column=0, columnspan=1, sticky="nsew")            
+        self.S1velj4 = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)
+        self.S1velj4.grid(row=7, column=1, columnspan=1, sticky="nsew")
+        self.S1velj4.insert(0,0)        
+        self.S1buttonj4c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S1buttonj4c.config(text = "Go")
+        self.S1buttonj4c.grid(row=7, column=2, columnspan=4, sticky="nsew")
+        self.S1buttonj4c.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj4.get()) , 4),-1)
         self.S1buttonj4c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
         self.buttonsSection1(5, 8, 0,"Rotacion del gripper")
@@ -115,20 +122,110 @@ class ArmTeleop:
         self.S1buttonj6w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj6.get()) , 6))
         self.S1buttonj6w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj6c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
-        
-                
+
+        #POSICIONES
+        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2.config(text="Posiciones directas")
+        self.labelTitleS2.grid(row=1, column=5, columnspan=4, sticky="nsew")        
+
+        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2.config(text="Home")
+        self.labelTitleS2.grid(row=2, column=5, columnspan=4, sticky="nsew")
+
+        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2.config(text = "intermedio")
+        self.S2buttonp2.grid(row=3, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("INTERMEDIO"))
+
+        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2.config(text = "home")
+        self.S2buttonp2.grid(row=4, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("HOME"))
+
+        """self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2.config(text = "home3")
+        self.S2buttonp2.grid(row=5, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("INTERMEDIO"))"""
+
+
+        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2.config(text=" ")
+        self.labelTitleS2.grid(row=6, column=5, columnspan=4, sticky="nsew")  
+
+        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2.config(text = "Pull")
+        self.S2buttonp2.grid(row=7, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("PULL"))
+
+        self.S2buttonp3 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp3.config(text = "Write")
+        self.S2buttonp3.grid(row=8, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("WRITE"))
+
+        self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp4.config(text = "Floor")
+        self.S2buttonp4.grid(row=9, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("FLOOR"))        
+
+
+        #self.entryandlabelsSection2(1, 4, 4)
 
         self.labelInfo = Label(self.root, font=("Consolas", 10), width=36, bg="white", bd=0, justify=LEFT)
-        self.labelInfo.config(text=self.getTxt())
+        txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
+        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
+        txt += "Apertura del Gripper = "+str(self.values_map["joint6"])+"\n"
+        txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
+        txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
+        self.labelInfo.config(text=txt)
         self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
 
         photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
-        self.otherButton.config(text = "")
+        self.otherButton.config(text = "")        
         self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")  
-        self.publish_angles()      
+        #self.publish_angles()      
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
+
+    def PresionadoDerecha(self, id):
+        print("presionado", id)
+        x = self.values_map["joint1"]
+        y = self.values_map["joint2"]
+        z = self.values_map["joint3"]
+        phi = self.values_map["joint4"]
+        if(id == "HOME"):
+            x = .134
+            y =  0
+            z =  .647   
+            phi = 0
+        elif(id == "INTERMEDIO"):
+            x = 0
+            y = 0
+            z = 3.677
+            phi = 0
+        elif(id == "PULL"):
+            x = 3.33
+            y = 0
+            z = 3.35
+        elif (id == "WRITE"):
+            x = 3.33
+            y = 0
+            z = 1.35
+        elif (id == "FLOOR"):
+            x = 3.28
+            y = 0
+            z = -2.37
+        self.values_map["joint1"] = x
+        self.values_map["joint2"] = y
+        self.values_map["joint3"] = z
+        self.values_map["joint4"] = phi
+        self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])
+        self.labelInfo.config(text=self.getTxt())
+
+
+        
+        
+
 
     def ikine_brazo(self, xm, ym, zm, phi_int):        
         if (xm != 0 or ym != 0 or zm != 0):
@@ -178,9 +275,8 @@ class ArmTeleop:
         x4 = x3+self.l4*math.cos(acum)
         y4 = y3+self.l4*math.sin(acum)
 
-        if(y4 > self.limit_z and (x4 > self.limit_chassis or y4 >= 0)):
-            self.publish_angles()
-            
+        if(y4 > self.limit_z and (x4 > self.limit_chassis or y4 >= 0)):            
+            #self.publish_angles()
             self.values_map["joint1"] = x3
             self.values_map["joint3"] = y3
             
@@ -218,11 +314,20 @@ class ArmTeleop:
         #self.lock_drive_teleop()
         ### phase of send the data of the joints
         key = "joint"+str(joint)
-        self.values_map[key]+=(data*(sign*-1))    
-        if(joint < 5):
+        if(key == "joint4"):
+            prev = self.values_map[key]
+            self.values_map[key] = data
+            poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
+            if(not poss):
+                self.values_map[key] = prev
+        else:    
+            self.values_map[key]+=(data*(sign*-1))    
+            
+        if(joint < 4):
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
                 self.values_map[key]+=(data*(sign))
+        
         if(joint == 1):       
             if(data != 0):
                 self.S1labelj1.config(bg="#34eb61")
@@ -290,11 +395,12 @@ class ArmTeleop:
         self.S1labelj6.config(bg="white")  
     
     def getTxt(self):
+        self.publish_angles()
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
         txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
         txt += "Apertura del Gripper = "+str(self.values_map["joint6"])+"\n"
-        txt += "q1:"+str(round(self.angles_map["q1"],2))+" q2:"+str(round(self.angles_map["q2"],2))+"\n"
-        txt += "q3:"+str(round(self.angles_map["q3"],2))+" q4:"+str(round(self.angles_map["q4"],2))
+        txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
+        txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
         return txt
 
 if __name__ == '__main__':
