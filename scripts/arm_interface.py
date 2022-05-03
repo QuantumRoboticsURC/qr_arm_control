@@ -24,16 +24,16 @@ class ArmTeleop:
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
         self.joint5 = rospy.Publisher('arm_teleop/rotacion_gripper', Int32, queue_size=1)
         self.gripper = rospy.Publisher('arm_teleop/apertura_gripper', Int32, queue_size=1)
-        self.gripper_apertur = 100
-        self.joint5_position = 321        
+        self.gripper_apertur = 60
+        self.joint5_position = 1500        
 
         self.values_map = {
             "joint1": .134,#.4
             "joint2": 0,#.9
             "joint3": .647,
-            "joint4": 0,
-            "joint5": 0,
-            "joint6": 0
+            "joint4": 0,#phi
+            "joint5": 0,#rotacion
+            "joint6": 0#apertura
         }
 
         self.l1 = 0
@@ -118,10 +118,16 @@ class ArmTeleop:
         self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
         self.buttonsSection1(6, 9, 0,"Abrir/cerrar")
-        self.S1buttonj6c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj4.get()) , 6),-1)
+        self.S1buttonj6c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj6.get()) , 6),-1)
         self.S1buttonj6w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj6.get()) , 6))
         self.S1buttonj6w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj6c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
+
+        self.buttonsSection1(7, 10, 0,"El palito xD")
+        self.S1buttonj7c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj6.get()) , 6),-1)
+        self.S1buttonj7w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj6.get()) , 6))
+        self.S1buttonj7w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
+        self.S1buttonj7c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
         #POSICIONES
         self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
@@ -177,12 +183,12 @@ class ArmTeleop:
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
         self.labelInfo.config(text=txt)
-        self.labelInfo.grid(row=10, column=0, columnspan=4, sticky="nsew")
+        self.labelInfo.grid(row=11, column=0, columnspan=4, sticky="nsew")
 
         photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "")        
-        self.otherButton.grid(row=11, column=0, columnspan=4, sticky="nsew")  
+        self.otherButton.grid(row=12, column=0, columnspan=4, sticky="nsew")  
         #self.publish_angles()      
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
@@ -355,6 +361,7 @@ class ArmTeleop:
             else:
                 self.S1labelj5.config(bg="white")
         elif(joint == 6):
+            print("aaaah")
             self.gripper.publish(self.values_map[key])
             if(data != 0):
                 self.S1labelj6.config(bg="#34eb61")
