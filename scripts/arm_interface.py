@@ -22,18 +22,18 @@ class ArmTeleop:
         self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
-        self.joint5 = rospy.Publisher('arm_teleop/rotacion_gripper', Int32, queue_size=1)
-        self.gripper = rospy.Publisher('arm_teleop/apertura_gripper', Int32, queue_size=1)
-        self.gripper_apertur = 60
-        self.joint5_position = 1500        
+        self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #gripper rotacion
+        self.gripper = rospy.Publisher('arm_teleop/gripper', Int32, queue_size=1) #lineal 
+        self.lineal = rospy.Publisher('arm_teleop/lineal', Int32, queue_size=1) #lineal 
+        
+        self.gripper_apertur = 60 #0 y 60
 
         self.values_map = {
             "joint1": .134,#.4
             "joint2": 0,#.9
             "joint3": .647,
             "joint4": 0,#phi
-            "joint5": 0,#rotacion
-            "joint6": 0#apertura
+            "joint5": 1500,#rotacion
         }
 
         self.l1 = 0
@@ -45,7 +45,8 @@ class ArmTeleop:
             "q1":(-90,90),
             "q2":(0,161),
             "q3":(-165.4,0),
-            "q4":(-90,90)
+            "q4":(-90,90),
+            "joint5":(1000,2000)#Tambien tengo 500 y 2500
         }
 
         self.angles_map={
@@ -111,21 +112,21 @@ class ArmTeleop:
         self.S1buttonj4c.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj4.get()) , 4),-1)
         self.S1buttonj4c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        self.buttonsSection1(5, 8, 0,"Rotacion del gripper")
+        self.buttonsSection1(5, 8, 0,"Rotacion del gripper","100")
         self.S1buttonj5w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj5.get()) , 5))
         self.S1buttonj5w.bind("<ButtonRelease-1>", lambda event: self.unpressed())
         self.S1buttonj5c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj5.get()) , 5),-1)
         self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        self.buttonsSection1(6, 9, 0,"Abrir/cerrar")
-        self.S1buttonj6c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj6.get()) , 6),-1)
-        self.S1buttonj6w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj6.get()) , 6))
+        self.buttonsSection1(6, 9, 0,"Abrir/cerrar","30")
+        self.S1buttonj6c.bind("<ButtonPress-1>", lambda event: self.pressed(int("-"+self.S1velj6.get()) , 6),-1)
+        self.S1buttonj6w.bind("<ButtonPress-1>", lambda event: self.pressed(int(self.S1velj6.get()) , 6))
         self.S1buttonj6w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj6c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        self.buttonsSection1(7, 10, 0,"El palito xD")
-        self.S1buttonj7c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj6.get()) , 6),-1)
-        self.S1buttonj7w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj6.get()) , 6))
+        self.buttonsSection1(7, 10, 0,"El palito xD","30")
+        self.S1buttonj7c.bind("<ButtonPress-1>", lambda event: self.pressed(int("-"+self.S1velj7.get()) , 7),-1)
+        self.S1buttonj7w.bind("<ButtonPress-1>", lambda event: self.pressed(int(self.S1velj7.get()) , 7))
         self.S1buttonj7w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
         self.S1buttonj7c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
@@ -179,7 +180,6 @@ class ArmTeleop:
         self.labelInfo = Label(self.root, font=("Consolas", 10), width=36, bg="white", bd=0, justify=LEFT)
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
         txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
-        txt += "Apertura del Gripper = "+str(self.values_map["joint6"])+"\n"
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
         self.labelInfo.config(text=txt)
@@ -320,7 +320,20 @@ class ArmTeleop:
         #self.lock_drive_teleop()
         ### phase of send the data of the joints
         key = "joint"+str(joint)
-        if(key == "joint4"):
+        if(joint == 6):
+            data*=-1
+            self.gripper.publish(data)        
+            if(data != 0):
+                self.S1labelj6.config(bg="#34eb61")
+            else:
+                self.S1labelj6.config(bg="white")
+            return None
+        if(joint == 7):
+            data*=-1
+            self.lineal.publish(data)
+            return None
+
+        if(joint == 4):
             prev = self.values_map[key]
             self.values_map[key] = data
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
@@ -355,18 +368,13 @@ class ArmTeleop:
             else:
                 self.S1labelj4.config(bg="white")
         elif(joint == 5):
-            self.joint5.publish(self.values_map[key])
+            self.values_map[key] = self.qlimit(self.limits_map[key], self.values_map[key])
+            self.joint5.publish(self.values_map[key])            
+            
             if(data != 0):
                 self.S1labelj5.config(bg="#34eb61")
             else:
                 self.S1labelj5.config(bg="white")
-        elif(joint == 6):
-            print("aaaah")
-            self.gripper.publish(self.values_map[key])
-            if(data != 0):
-                self.S1labelj6.config(bg="#34eb61")
-            else:
-                self.S1labelj6.config(bg="white")
         
         self.labelInfo.config(text=self.getTxt())
         
@@ -405,7 +413,6 @@ class ArmTeleop:
         self.publish_angles()
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
         txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
-        txt += "Apertura del Gripper = "+str(self.values_map["joint6"])+"\n"
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
         return txt
