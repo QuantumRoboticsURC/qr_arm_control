@@ -22,9 +22,9 @@ class ArmTeleop:
         self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
-        self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #gripper rotacion
-        self.gripper = rospy.Publisher('arm_teleop/gripper', Int32, queue_size=1) #lineal 
-        self.lineal = rospy.Publisher('arm_teleop/lineal', Int32, queue_size=1) #lineal 
+        self.joint5 = rospy.Publisher('arm_teleop/joint5', Float64, queue_size=1) #gripper rotacion
+        self.gripper = rospy.Publisher('arm_teleop/gripper', Float64, queue_size=1) #lineal 
+        self.lineal = rospy.Publisher('arm_teleop/prism', Float64, queue_size=1) #lineal 
         
         self.gripper_apertur = 60 #0 y 60
 
