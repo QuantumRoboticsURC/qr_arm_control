@@ -55,7 +55,7 @@ class ArmTeleop:
             "q3":-165.4,#
             "q4":8
         }
-        self.limit_z = -3
+        self.limit_z = -4.2
         self.limit_chassis = 1.1
         #11cm del chasis
         
@@ -174,15 +174,15 @@ class ArmTeleop:
         self.S2buttonp2.grid(row=3, column=5, columnspan=4, sticky="nsew")
         self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("INTERMEDIO"))
 
-        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
-        self.S2buttonp2.config(text = "home")
-        self.S2buttonp2.grid(row=4, column=5, columnspan=4, sticky="nsew")
-        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("HOME"))
+        self.S2buttonp3 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp3.config(text = "home")
+        self.S2buttonp3.grid(row=4, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("HOME"))
 
-        """self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
-        self.S2buttonp2.config(text = "home3")
-        self.S2buttonp2.grid(row=5, column=5, columnspan=4, sticky="nsew")
-        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("INTERMEDIO"))"""
+        self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
+        self.S2buttonp4.config(text = "storage")
+        self.S2buttonp4.grid(row=5, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("STORAGE"))
 
 
         self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
@@ -215,7 +215,7 @@ class ArmTeleop:
         self.labelInfo.config(text=txt)
         self.labelInfo.grid(row=11, column=0, columnspan=4, sticky="nsew")
 
-        photo = ImageTk.PhotoImage(Image.open("/home/jossian/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
+        photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "")        
         self.otherButton.grid(row=12, column=0, columnspan=4, sticky="nsew")  
@@ -251,6 +251,9 @@ class ArmTeleop:
             x = 3.28
             y = 0
             z = -2.37
+            phi = -90
+        elif (id == "STORAGE"):
+            phi = 90
         self.values_map["joint1"] = x
         self.values_map["joint2"] = y
         self.values_map["joint3"] = z
