@@ -145,9 +145,6 @@ class ArmTeleop:
         self.S1labelj7 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
         self.S1labelj7.config(text="Actuador prismatico")
         self.S1labelj7.grid(row=10, column=0, columnspan=1, sticky="nsew")            
-       # self.S1velj7 = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)
-        #self.S1velj7.grid(row=10, column=1, columnspan=1, sticky="nsew")
-        #self.S1velj7.insert(0,0)        
         self.S1buttonj7w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
         self.S1buttonj7w.config(text = "Cerrar")
         self.S1buttonj7w.grid(row=10, column=2, columnspan=1, sticky="nsew")
@@ -158,6 +155,13 @@ class ArmTeleop:
         self.S1buttonj7w.bind("<ButtonPress-1>", lambda event: self.pressed(int(1) , 7))
         self.S1buttonj7w.bind("<ButtonRelease-1>", lambda event: self.unpressedj7())        
         self.S1buttonj7c.bind("<ButtonRelease-1>", lambda event: self.unpressedj7())
+
+        #CAMERA
+        self.buttonsSection1(8, 11, 0,"Camera","100")
+        self.S1buttonj5w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj5.get()) , 5))
+        self.S1buttonj5w.bind("<ButtonRelease-1>", lambda event: self.unpressed())
+        self.S1buttonj5c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj5.get()) , 5),-1)
+        self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
 
         #POSICIONES
@@ -207,18 +211,18 @@ class ArmTeleop:
 
         #self.entryandlabelsSection2(1, 4, 4)
 
-        self.labelInfo = Label(self.root, font=("Consolas", 10), width=36, bg="white", bd=0, justify=LEFT)
+        self.labelInfo = Label(self.root, font=("Consolas", 11), width=36, bg="white", bd=0, justify=LEFT)
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
         txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
         self.labelInfo.config(text=txt)
-        self.labelInfo.grid(row=11, column=0, columnspan=4, sticky="nsew")
-
-        photo = ImageTk.PhotoImage(Image.open("/home/arihc/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
+        self.labelInfo.grid(row=12, column=0, columnspan=4, sticky="nsew")
+        
+        photo = ImageTk.PhotoImage(Image.open("qr_arm.png")) 
         self.otherButton = Button(self.root, image = photo)
         self.otherButton.config(text = "")        
-        self.otherButton.grid(row=12, column=0, columnspan=4, sticky="nsew")  
+        self.otherButton.grid(row=13, column=0, columnspan=4, sticky="nsew")
         #self.publish_angles()      
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
