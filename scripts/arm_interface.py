@@ -22,7 +22,7 @@ class ArmTeleop:
         self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
-        self.joint5 = rospy.Publisher('arm_teleop/joint5', Float64, queue_size=1) #gripper rotacion
+        self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #gripper rotacion
         self.gripper = rospy.Publisher('arm_teleop/gripper', Float64, queue_size=1) #lineal 
         self.lineal = rospy.Publisher('arm_teleop/prism', Float64, queue_size=1) #lineal 
         
@@ -31,7 +31,7 @@ class ArmTeleop:
         self.values_map = {
             "joint1": .134,#.4
             "joint2": 0,#.9
-            "joint3": .647,
+            "joint3": .747,
             "joint4": 0,#phi
             "joint5": 1500,#rotacion
         }
@@ -53,7 +53,7 @@ class ArmTeleop:
             "q1":0,
             "q2":161,
             "q3":-165.4,#
-            "q4":8
+            "q4":0
         }
         self.limit_z = -4.2
         self.limit_chassis = 1.1
@@ -176,7 +176,7 @@ class ArmTeleop:
 
         self.S2buttonp3 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
         self.S2buttonp3.config(text = "home")
-        self.S2buttonp3.grid(row=4, column=5, columnspan=4, sticky="nsew")
+        self.S2buttonp3.grid(row=4, column=5, columnspan=4, sticky="nsew", padx=50)
         self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("HOME"))
 
         self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
@@ -202,7 +202,7 @@ class ArmTeleop:
         self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg="#ff523b", bd=0, justify=CENTER, fg="white")
         self.S2buttonp4.config(text = "Floor")
         self.S2buttonp4.grid(row=9, column=5, columnspan=4, sticky="nsew")
-        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("FLOOR"))        
+        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("FLOOR"))            
 
 
         #self.entryandlabelsSection2(1, 4, 4)
@@ -224,7 +224,7 @@ class ArmTeleop:
         self.ArmControlWindow.mainloop()
 
     def PresionadoDerecha(self, id):
-        print("presionado", id)
+        #print("presionado", id)
         x = self.values_map["joint1"]
         y = self.values_map["joint2"]
         z = self.values_map["joint3"]
@@ -232,7 +232,7 @@ class ArmTeleop:
         if(id == "HOME"):
             x = .134
             y =  0
-            z =  .647   
+            z =  .747#.647 
             phi = 0
         elif(id == "INTERMEDIO"):
             x = 0
@@ -371,6 +371,7 @@ class ArmTeleop:
             self.values_map[key] = data
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
+                print("Ya valio x1")
                 self.values_map[key] = prev
         else:    
             self.values_map[key]+=(data*(sign*-1))    
@@ -378,6 +379,7 @@ class ArmTeleop:
         if(joint < 4):
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
+                print("ya valio x2")
                 self.values_map[key]+=(data*(sign))
         
         if(joint == 1):       

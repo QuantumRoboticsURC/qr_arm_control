@@ -35,6 +35,7 @@ def plotAgain():
     x3 = x2+l3*math.cos(acum)
     y3 = y2+l3*math.sin(acum)
 
+    print(q["q4"])
     acum+=math.radians(q["q4"])
     x4 = x3+l4*math.cos(acum) 
     y4 = y3+l4*math.sin(acum)
@@ -44,6 +45,7 @@ def plotAgain():
     plt.plot([x0,x2], [y0,y2])
     plt.plot([x2,x3], [y2,y3])
     plt.plot([x3,x4], [y3,y4])
+    
     plt.plot([-7,7], [-4.2,-4.2])
     plt.axis([-7.0,7.0, -7.0,7.0])
     plt.grid()
