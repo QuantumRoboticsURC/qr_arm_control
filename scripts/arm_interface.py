@@ -51,7 +51,7 @@ class ArmTeleop:
             "q2":(0,161),
             "q3":(-165.4,0),
             "q4":(-90,90),
-            "joint5":(1000,2000),
+            "joint5":(-90,90),
             "camera":(100,140)
         }
 
@@ -363,7 +363,10 @@ class ArmTeleop:
             return l[0]
         if (val > l[1]):
             return l[1]
-        return val     
+        return val   
+
+    def my_map(self,in_min, in_max, out_min, out_max, x):
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
     def pressed(self, data, joint, sign = 1):        
         
@@ -391,7 +394,8 @@ class ArmTeleop:
                 print("Ya valio x1")
                 self.values_map[key] = prev
         elif (joint == 5):
-            self.values_map[key] = self.qlimit(self.limits_map["joint5"],data)                        
+            self.values_map[key] = self.qlimit(self.limits_map["joint5"],data)
+            self.joint5.publish(self.my_map(-90,90,1230,1770,self.values_map[key]))
         else:    
             self.values_map[key]+=(data*(sign*-1))    
             
