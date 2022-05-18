@@ -123,11 +123,17 @@ class ArmTeleop:
         exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')        	"""
 
 
-        self.buttonsSection1(5, 8, 0,"Rotacion del gripper","100")
-        self.S1buttonj5w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj5.get()) , 5))
-        self.S1buttonj5w.bind("<ButtonRelease-1>", lambda event: self.unpressed())
-        self.S1buttonj5c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj5.get()) , 5),-1)
-        self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
+        self.S1labelj5 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj5.config(text="Rotacion del gripper")
+        self.S1labelj5.grid(row=8, column=0, columnspan=1, sticky="nsew")            
+        self.S1velj5 = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)
+        self.S1velj5.grid(row=8, column=1, columnspan=1, sticky="nsew")
+        self.S1velj5.insert(0,0)        
+        self.S1buttonj5c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj5c.config(text = "Go")
+        self.S1buttonj5c.grid(row=8, column=2, columnspan=2, sticky="nsew")
+        self.S1buttonj5c.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj5.get()) , 5),-1)
+        self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
 
        # self.buttonsSection1(6, 9, 0,"Gripper","30")
         self.S1labelj6 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
@@ -384,6 +390,8 @@ class ArmTeleop:
             if(not poss):
                 print("Ya valio x1")
                 self.values_map[key] = prev
+        elif (joint == 5):
+            self.values_map[key] = self.qlimit(self.limits_map["joint5"],data)                        
         else:    
             self.values_map[key]+=(data*(sign*-1))    
             
@@ -413,14 +421,6 @@ class ArmTeleop:
                 self.S1labelj4.config(bg="#34eb61")
             else:
                 self.S1labelj4.config(bg="white")
-        elif(joint == 5):
-            self.values_map[key] = self.qlimit(self.limits_map[key], self.values_map[key])
-            self.joint5.publish(self.values_map[key])            
-            
-            if(data != 0):
-                self.S1labelj5.config(bg="#34eb61")
-            else:
-                self.S1labelj5.config(bg="white")
         elif(joint == 8):
             self.values_map[key] = self.qlimit(self.limits_map["camera"], self.values_map[key])
             self.camera.publish(self.values_map[key])            
@@ -452,8 +452,7 @@ class ArmTeleop:
         exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
         exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')        	
 
-    def pressedCamera(self):
-        pass
+
     def unpressedj7(self):
         self.S1labelj7.config(bg="white")
         self.lineal.publish(0.0)    
