@@ -36,7 +36,7 @@ class ArmTeleop:
             "joint2": 0,#.9
             "joint3": .84,
             "joint4": 0,#phi
-            "joint5": 1500,#rotacion
+            "joint5": 0,#rotacion
             "joint8": 140,#camera
         }
         self.rospack = rospkg.RosPack()
