@@ -32,7 +32,7 @@ class ArmTeleop:
         self.blueTec = "#466cbe"#466cbe
         self.released = "#466cbe"
         self.values_map = {
-            "joint1": .134,#.4
+            "joint1": 0,#.4
             "joint2": 0,#.9
             "joint3": .84,
             "joint4": 0,#phi
@@ -93,7 +93,7 @@ class ArmTeleop:
         self.S1buttonj1w.bind("<ButtonRelease-1>", lambda event: self.unpressed())
         self.S1buttonj1c.bind("<ButtonRelease-1>", lambda event: self.unpressed())                
 
-        self.buttonsSection1(2, 5, 0, "Position Y")
+        self.buttonsSection1(2, 5, 0, "Position Y","5")
         self.S1buttonj2c.bind("<ButtonPress-1>", lambda event: self.pressed(float("-"+self.S1velj2.get()), 2),-1)
         self.S1buttonj2w.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj2.get()), 2))
         self.S1buttonj2w.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
@@ -304,8 +304,7 @@ class ArmTeleop:
             else:
                 Q1 = numpy.real(math.atan2(ym,xm))#real
         #Para q1
-        q1=numpy.rad2deg(Q1)
-        q1=self.qlimit(self.limits_map["q1"],q1)
+        q1=self.angles_map["q1"]
         #Para q2      
         hip=math.sqrt(xm**2+(zm-self.l1)**2)
         phi = math.atan2(zm-self.l1, xm)
@@ -335,8 +334,7 @@ class ArmTeleop:
             #self.publish_angles()
             self.values_map["joint1"] = x3
             self.values_map["joint3"] = y3
-            
-            self.angles_map["q1"] = q1
+
             self.angles_map["q2"] = q2
             self.angles_map["q3"] = q3
             self.angles_map["q4"] = q4
@@ -398,8 +396,11 @@ class ArmTeleop:
             self.joint5.publish(self.my_map(-90,90,1230,1770,self.values_map[key]))
         else:    
             self.values_map[key]+=(data*(sign*-1))    
+        if(joint == 2):
+            self.angles_map["q1"]+=(data*(sign*-1))    
+            self.angles_map["q1"] = self.qlimit(self.limits_map["q1"],self.angles_map["q1"])
             
-        if(joint < 4):
+        if(joint < 4 and joint != 2):
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
                 print("ya valio x2")

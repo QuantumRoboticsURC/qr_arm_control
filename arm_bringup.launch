@@ -1,0 +1,5 @@
+<launch>
+
+  	<node name="arm_2d_simulation" pkg="qr_arm_control" type="arm_2d_simulation.py" output="screen"/>
+  	<node name="arm_interface" pkg="qr_arm_control" type="arm_interface.py" output="screen"/>
+</launch>
