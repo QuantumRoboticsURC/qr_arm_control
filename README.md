@@ -1,6 +1,6 @@
 # qr_arm_control
 <p align="center">
-  <img src="https://github.com/QuantumRoboticsURC/qr_arm_control/blob/main/Inteface.gif" alt="animated" width="90%" height="90%"/>
+  <img src="https://github.com/QuantumRoboticsURC/qr_arm_control/blob/main/IntefaceGIF.gif" alt="animated" width="90%" height="90%"/>
 </p>
 
 ## Clone your repo into your catkin workspace
