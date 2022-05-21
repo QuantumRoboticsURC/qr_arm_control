@@ -11,10 +11,6 @@ cd ~/catkin_ws/
 catkin_make
 ```
 ## General steps:
-Change photo variable from qr_arm_control/scripts/arm_interface.py to your real path:
-```
-photo = ImageTk.PhotoImage(Image.open("/home/jossian/catkin_ws/src/qr_arm_control/scripts/qr_arm.png"))
-```
 
 First you need to run roscore:
 ```
@@ -29,4 +25,9 @@ rosrun qr_arm_control arm_interface.py
 ### Run 2D simulation in matplotlib:
 ```
 rosrun qr_arm_control arm_2d_simulation.py
+```
+
+### Roslaunch
+```
+roslaunch qr_arm_control arm_bringup.launch
 ```
