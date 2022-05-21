@@ -271,8 +271,11 @@ class ArmTeleop:
             x = 3.28
             y = 0
             z = -2.37
-            phi = -90
+            phi = 0
         elif (id == "STORAGE"):
+            x = .134
+            y =  0
+            z =  .84
             phi = 90
         self.values_map["joint1"] = x
         self.values_map["joint2"] = y
