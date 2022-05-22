@@ -23,7 +23,7 @@ class ArmTeleop:
         self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
-        self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #gripper rotacion
+        self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #rotation gripper 
         self.gripper = rospy.Publisher('arm_teleop/gripper', Float64, queue_size=1) #lineal 
         self.lineal = rospy.Publisher('arm_teleop/prism', Float64, queue_size=1) #lineal 
         self.camera = rospy.Publisher('arm_teleop/cam', Int32, queue_size=1) #lineal 
@@ -36,7 +36,7 @@ class ArmTeleop:
             "joint2": 0,#.9
             "joint3": .84,
             "joint4": 0,#phi
-            "joint5": 0,#rotacion
+            "joint5": 0,#rotation
             "joint8": 140,#camera
         }
         self.rospack = rospkg.RosPack()
@@ -63,7 +63,7 @@ class ArmTeleop:
         }
         self.limit_z = -4.2
         self.limit_chassis = 1.1
-        #11cm del chasis
+        #11cm of the chassis
         
         ### Initialize graph interface
         self.ArmControlWindow = Tk()
@@ -74,17 +74,17 @@ class ArmTeleop:
         ##### Grpah Interface #####
         #980px width
         #each width 1 of label is 13px
-        self.title = Label(self.root, font=("Consolas", 18), width=72, bg="white", bd=0, justify=CENTER)
+        self.title = Label(self.root, font=("Consoles", 18), width=72, bg="white", bd=0, justify=CENTER)
         self.title.config(text="qr_arm_control")
         self.title.grid(row=0, column=0, columnspan=4, sticky="nsew")
        ##### Section1: When you hold down the button of a joint, the joint moves with the velocity defined in the slider
-        self.labelTitleS1 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS1 = Label(self.root, font=("Consoles", 12), width=36, bg="white", bd=0, justify=CENTER)
         self.labelTitleS1.config(text="Section 1: Move each joint")
         self.labelTitleS1.grid(row=1, column=0, columnspan=4, sticky="nsew")
-        self.labelS1 = Label(self.root, font=("Consolas", 10), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelS1 = Label(self.root, font=("Consoles", 10), width=36, bg="white", bd=0, justify=CENTER)
         self.labelS1.config(text="\nHold down a button to move a joint\nthe joint moves with the velocity defined in the sliders\n")
         self.labelS1.grid(row=2, column=0, columnspan=4, sticky="nsew")
-        self.labelS1Headers = Label(self.root, font=("Consolas", 8), width=36, bg="white", bd=0, justify=RIGHT, anchor=E)
+        self.labelS1Headers = Label(self.root, font=("Consoles", 8), width=36, bg="white", bd=0, justify=RIGHT, anchor=E)
         self.labelS1Headers.config(text="Joint        |     Velocity      |    Button Clockwise   |Button Counterclockwise")
         #self.labelS1Headers.grid(row=3, column=0, columnspan=4, sticky="nsew")                
         self.buttonsSection1(1, 4, 0, "Position X")
@@ -106,45 +106,45 @@ class ArmTeleop:
         self.S1buttonj3c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
         #self.buttonsSection1(4, 7, 0,"Phi", "5")
-        self.S1labelj4 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj4 = Button(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, anchor=CENTER)
         self.S1labelj4.config(text="Phi")
         self.S1labelj4.grid(row=7, column=0, columnspan=1, sticky="nsew")            
-        self.S1velj4 = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)
+        self.S1velj4 = Entry(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, justify=CENTER)
         self.S1velj4.grid(row=7, column=1, columnspan=1, sticky="nsew")
         self.S1velj4.insert(0,0)        
-        self.S1buttonj4c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj4c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S1buttonj4c.config(text = "Go")
         self.S1buttonj4c.grid(row=7, column=2, columnspan=2, sticky="nsew")
         self.S1buttonj4c.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj4.get()) , 4),-1)
         self.S1buttonj4c.bind("<ButtonRelease-1>", lambda event: self.unpressed())
 
-        """exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
+        """exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
         exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
         exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')        	"""
 
 
-        self.S1labelj5 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
-        self.S1labelj5.config(text="Rotacion del gripper")
+        self.S1labelj5 = Button(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj5.config(text="Gripper Rotation")
         self.S1labelj5.grid(row=8, column=0, columnspan=1, sticky="nsew")            
-        self.S1velj5 = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)
+        self.S1velj5 = Entry(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, justify=CENTER)
         self.S1velj5.grid(row=8, column=1, columnspan=1, sticky="nsew")
         self.S1velj5.insert(0,0)        
-        self.S1buttonj5c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj5c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S1buttonj5c.config(text = "Go")
         self.S1buttonj5c.grid(row=8, column=2, columnspan=2, sticky="nsew")
         self.S1buttonj5c.bind("<ButtonPress-1>", lambda event: self.pressed(float(self.S1velj5.get()) , 5),-1)
         self.S1buttonj5c.bind("<ButtonRelease-1>", lambda event: self.unpressed())        
 
        # self.buttonsSection1(6, 9, 0,"Gripper","30")
-        self.S1labelj6 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj6 = Button(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, anchor=CENTER)
         self.S1labelj6.config(text="Gripper")
         self.S1labelj6.grid(row=9, column=0, columnspan=1, sticky="nsew")            
 
-        self.S1buttonj6w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
-        self.S1buttonj6w.config(text = "Cerrar")
+        self.S1buttonj6w = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj6w.config(text = "Close")
         self.S1buttonj6w.grid(row=9, column=2, columnspan=1, sticky="nsew")
-        self.S1buttonj6c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
-        self.S1buttonj6c.config(text = "Abrir")
+        self.S1buttonj6c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj6c.config(text = "Open")
         self.S1buttonj6c.grid(row=9, column=3, columnspan=1, sticky="nsew")
         self.S1buttonj6w.bind("<ButtonPress-1>", lambda event: self.pressed(int("-1") , 6),-1)
         self.S1buttonj6c.bind("<ButtonPress-1>", lambda event: self.pressed(int(1) , 6))
@@ -156,15 +156,15 @@ class ArmTeleop:
 
 
 
-        #self.buttonsSection1(7, 10, 0,"Actuador prismatico","30")
-        self.S1labelj7 = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)
-        self.S1labelj7.config(text="Actuador prismatico")
+        #self.buttonsSection1(7, 10, 0,"Prismatic Actuator","30")
+        self.S1labelj7 = Button(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, anchor=CENTER)
+        self.S1labelj7.config(text="Prismatic Actuator")
         self.S1labelj7.grid(row=10, column=0, columnspan=1, sticky="nsew")            
-        self.S1buttonj7w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
-        self.S1buttonj7w.config(text = "Cerrar")
+        self.S1buttonj7w = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj7w.config(text = "Close")
         self.S1buttonj7w.grid(row=10, column=2, columnspan=1, sticky="nsew")
-        self.S1buttonj7c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
-        self.S1buttonj7c.config(text = "Abrir")
+        self.S1buttonj7c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S1buttonj7c.config(text = "Open")
         self.S1buttonj7c.grid(row=10, column=3, columnspan=1, sticky="nsew")
         self.S1buttonj7c.bind("<ButtonPress-1>", lambda event: self.pressed(int("-1") , 7),-1)
         self.S1buttonj7w.bind("<ButtonPress-1>", lambda event: self.pressed(int(1) , 7))
@@ -180,55 +180,55 @@ class ArmTeleop:
 
 
         #POSICIONES
-        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
-        self.labelTitleS2.config(text="Posiciones directas")
+        self.labelTitleS2 = Label(self.root, font=("Consoles", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2.config(text="Direct Positions")
         self.labelTitleS2.grid(row=1, column=5, columnspan=4, sticky="nsew")        
 
-        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2 = Label(self.root, font=("Consoles", 12), width=36, bg="white", bd=0, justify=CENTER)
         self.labelTitleS2.config(text="Home")
         self.labelTitleS2.grid(row=2, column=5, columnspan=4, sticky="nsew")
 
-        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
-        self.S2buttonp2.config(text = "intermedio")
+        self.S2buttonp2 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2.config(text = "intermediate")
         self.S2buttonp2.grid(row=4, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("INTERMEDIO"))
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PressedRight("INTERMEDIATE"))
 
-        self.S2buttonp3 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp3 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S2buttonp3.config(text = "home")
         self.S2buttonp3.grid(row=5, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("HOME"))
+        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PressedRight("HOME"))
 
-        self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp4 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S2buttonp4.config(text = "storage")
         self.S2buttonp4.grid(row=6, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("STORAGE"))
+        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PressedRight("STORAGE"))
 
 
-        self.labelTitleS2 = Label(self.root, font=("Consolas", 12), width=36, bg="white", bd=0, justify=CENTER)
+        self.labelTitleS2 = Label(self.root, font=("Consoles", 12), width=36, bg="white", bd=0, justify=CENTER)
         self.labelTitleS2.config(text=" ")
         self.labelTitleS2.grid(row=7, column=5, columnspan=4, sticky="nsew", padx=50)  
 
-        self.S2buttonp2 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp2 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S2buttonp2.config(text = "Pull")
         self.S2buttonp2.grid(row=8, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("PULL"))
+        self.S2buttonp2.bind("<ButtonPress-1>", lambda event: self.PressedRight("PULL"))
 
-        self.S2buttonp3 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp3 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S2buttonp3.config(text = "Write")
         self.S2buttonp3.grid(row=9, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("WRITE"))
+        self.S2buttonp3.bind("<ButtonPress-1>", lambda event: self.PressedRight("WRITE"))
 
-        self.S2buttonp4 = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
+        self.S2buttonp4 = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")
         self.S2buttonp4.config(text = "Floor")
         self.S2buttonp4.grid(row=10, column=5, columnspan=4, sticky="nsew", padx=50)
-        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PresionadoDerecha("FLOOR"))            
+        self.S2buttonp4.bind("<ButtonPress-1>", lambda event: self.PressedRight("FLOOR"))            
 
 
         #self.entryandlabelsSection2(1, 4, 4)
 
-        self.labelInfo = Label(self.root, font=("Consolas", 11), width=36, bg="white", bd=0, justify=LEFT)
+        self.labelInfo = Label(self.root, font=("Consoles", 11), width=36, bg="white", bd=0, justify=LEFT)
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
-        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
+        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Gripper Rotation= "+str(self.values_map["joint5"])+"\n"
         txt += "Camera = " + str(self.values_map["joint8"])+"\n"
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
@@ -243,8 +243,8 @@ class ArmTeleop:
         ##### --------------- #####
         self.ArmControlWindow.mainloop()
 
-    def PresionadoDerecha(self, id):
-        #print("presionado", id)
+    def PressedRight(self, id):
+        #print("pressed", id)
         x = self.values_map["joint1"]
         y = self.values_map["joint2"]
         z = self.values_map["joint3"]
@@ -254,7 +254,7 @@ class ArmTeleop:
             y =  0
             z =  .84#.647 
             phi = 0
-        elif(id == "INTERMEDIO"):
+        elif(id == "INTERMEDIATE"):
             x = 0
             y = 0
             z = 3.677
@@ -271,11 +271,8 @@ class ArmTeleop:
             x = 3.28
             y = 0
             z = -2.37
-            phi = 0
+            phi = -90
         elif (id == "STORAGE"):
-            x = .134
-            y =  0
-            z =  .84
             phi = 90
         self.values_map["joint1"] = x
         self.values_map["joint2"] = y
@@ -372,7 +369,7 @@ class ArmTeleop:
     def pressed(self, data, joint, sign = 1):        
         
         #self.lock_drive_teleop()
-        ### phase of send the data of the joints
+        ### phase of sending the data of the joints
         key = "joint"+str(joint)
         if(joint == 6):
             data*=-1
@@ -392,7 +389,7 @@ class ArmTeleop:
             self.values_map[key] = data
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
-                print("Ya valio x1")
+                print("Some error x1")
                 self.values_map[key] = prev
         elif (joint == 5):
             self.values_map[key] = self.qlimit(self.limits_map["joint5"],data)
@@ -406,7 +403,7 @@ class ArmTeleop:
         if(joint < 4 and joint != 2):
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
             if(not poss):
-                print("ya valio x2")
+                print("Some error x2")
                 self.values_map[key]+=(data*(sign))
         
         if(joint == 1):       
@@ -443,20 +440,20 @@ class ArmTeleop:
         #time.sleep(.1)   
 
     def buttonsSection1(self, joint, row, col, desc, val=".2"):
-        #exec('self.S1labelj' + str(joint) + ' = Label(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER, anchor=W)')
-        exec('self.S1labelj' + str(joint) + ' = Button(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, anchor=CENTER)')
+        #exec('self.S1labelj' + str(joint) + ' = Label(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, justify=CENTER, anchor=W)')
+        exec('self.S1labelj' + str(joint) + ' = Button(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, anchor=CENTER)')
         exec('self.S1labelj' + str(joint) + '.config(text=" ' +desc + ':")')
         exec('self.S1labelj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col) + ', columnspan=1, sticky="nsew")')        
 
-        exec('self.S1buttonj' + str(joint) + 'w = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
+        exec('self.S1buttonj' + str(joint) + 'w = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
         exec('self.S1buttonj' + str(joint) + 'w.config(text="-")')
         exec('self.S1buttonj' + str(joint) + 'w.grid(row=' + str(row) + ', column=' + str(col+1) + ', columnspan=1, sticky="nsew")')
 
-        exec('self.S1velj' + str(joint) + ' = Entry(self.root, font=("Consolas", 10), width=1, bg="white", bd=0, justify=CENTER)')
+        exec('self.S1velj' + str(joint) + ' = Entry(self.root, font=("Consoles", 10), width=1, bg="white", bd=0, justify=CENTER)')
         exec('self.S1velj' + str(joint) + '.grid(row=' + str(row) + ', column=' + str(col+2) + ', columnspan=1, sticky="nsew")')
         exec('self.S1velj' + str(joint) + '.insert(0, '+val+')')
 
-        exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consolas", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
+        exec('self.S1buttonj' + str(joint) + 'c = Button(self.root, font=("Consoles", 8, "bold"), width=1, bg=self.blueTec, bd=0, justify=CENTER, fg="white")')
         exec('self.S1buttonj' + str(joint) + 'c.config(text="+")')
         exec('self.S1buttonj' + str(joint) + 'c.grid(row=' + str(row) + ', column=' + str(col+3) + ', columnspan=1, sticky="nsew")')        	
 
@@ -482,7 +479,7 @@ class ArmTeleop:
     def getTxt(self):
         self.publish_angles()
         txt = "Position X = "+str(round(self.values_map["joint1"],2))+"\n" + "Position Y = "+str(round(self.values_map["joint2"],2))+"\n"+"Position Z = "+str(round(self.values_map["joint3"],2))+"\n"
-        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Rotacion del gripper = "+str(self.values_map["joint5"])+"\n"
+        txt += "Position Phi = "+str(self.values_map["joint4"])+"\n"+"Gripper Rotation = "+str(self.values_map["joint5"])+"\n"
         txt += "Camera = " + str(self.values_map["joint8"])+"\n"
         txt += "q1:"+str(round(self.angles_map["q1"],2))+"\nq2:"+str(round(self.angles_map["q2"],2))+"\n"
         txt += "q3:"+str(round(self.angles_map["q3"],2))+"\nq4:"+str(round(self.angles_map["q4"],2))
