@@ -34,7 +34,7 @@ class ArmTeleop:
         self.values_map = {
             "joint1": 0,#.4
             "joint2": 0,#.9
-            "joint3": .84,
+            "joint3": .75,
             "joint4": 0,#phi
             "joint5": 0,#rotation
             "joint8": 140,#camera
@@ -50,7 +50,7 @@ class ArmTeleop:
             "q1":(-90,90),
             "q2":(0,161),
             "q3":(-165.4,0),
-            "q4":(-90,90),
+            "q4":(-135,90),
             "joint5":(-90,90),
             "camera":(100,140)
         }
@@ -252,7 +252,7 @@ class ArmTeleop:
         if(id == "HOME"):
             x = .134
             y =  0
-            z =  .84#.647 
+            z =  .75#.647 
             phi = 0
         elif(id == "INTERMEDIATE"):
             x = 0
