@@ -318,7 +318,8 @@ class ArmTeleop:
         q3=numpy.rad2deg(Q3)
         q3=self.qlimit(self.limits_map["q3"],q3)
         q4 = phi_int - q2 -q3  
-        q4=self.qlimit(self.limits_map["q4"],q4)            
+        q4=self.qlimit(self.limits_map["q4"],q4)    
+        self.values_map["joint4"] = q4+q3+q2        
         
         acum = math.radians(q2)
         x2 = self.l2*math.cos(acum) 
@@ -399,6 +400,7 @@ class ArmTeleop:
         if(joint == 2):
             self.angles_map["q1"]+=(data*(sign*-1))    
             self.angles_map["q1"] = self.qlimit(self.limits_map["q1"],self.angles_map["q1"])
+            self.values_map["joint2"] = self.angles_map["q1"]
             
         if(joint < 4 and joint != 2):
             poss = self.ikine_brazo(self.values_map["joint1"], self.values_map["joint2"], self.values_map["joint3"], self.values_map["joint4"])            
