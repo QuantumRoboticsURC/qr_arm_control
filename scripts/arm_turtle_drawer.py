@@ -1,22 +1,44 @@
 #!/usr/bin/env python
 
+"""
+Team: QUANTUM ROBOTICS
+
+Made by:Raul López Musito
+		a01378976@tec.mx
+		raulmusito@gmail.com
+
+Modified (DD/MM/YY): 
+	Raul Musito 29/06/2022 Creation
+
+Code description:
+1. Suscribes to a Joy node
+2. Uses de joy topic info to draw into a turtle screen
+
+Notas:
+-Beginner code
+"""
+
+#dependencies
 import rospy
 from sensor_msgs.msg import Joy
 import turtle
 
+#Turtle params
 screen = turtle.getscreen()
 tortuga = turtle.Turtle()
 x, y = 0, 0
 
+#global variables
 buttons, axes = [0,0,0,0,0,0,0], [0,0,0]
 
+#assignation to the global variables
 def callback(data):
 	global buttons, axes
 	buttons = data.buttons [:]
 	axes = data.axes [:]
 
 
-rospy.init_node('arm_turle_drawer')
+rospy.init_node('arm_turle_drawer')	#creates node
 image_sub = rospy.Subscriber("joy",Joy,callback)
 rate = rospy.Rate(20)
 
