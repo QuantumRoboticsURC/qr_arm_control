@@ -3,7 +3,7 @@
 """
 Team: QUANTUM ROBOTICS
 
-Made by:Raul López Musito
+Made by:Raul Lopez Musito
 		a01378976@tec.mx
 		raulmusito@gmail.com
 

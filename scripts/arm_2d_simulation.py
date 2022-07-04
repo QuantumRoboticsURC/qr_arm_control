@@ -24,9 +24,6 @@ q = {
         
 def plotAgain():
     print(q["q1"],q["q2"],q["q3"],q["q4"])
-    #x1 = l1*math.cos(math.radians(q["q1"]))
-    #y1 = l1*math.sin(math.radians(q["q1"]))    
-    #plt.show()
     acum = math.radians(q["q2"])
     x2 = l2*math.cos(acum) 
     y2 = l2*math.sin(acum)
@@ -59,11 +56,13 @@ def doQ1(msg):
     q["q2"] = float(qs[1])
     q["q3"] = float(qs[2])
     q["q4"] = float(qs[3])    
-    plotAgain()
-
 
 rospy.init_node('arm_inverse_kinematics')
 sub = rospy.Subscriber ('/inverse_kinematics/Q', String, doQ1)
 plt.show()
-#plotAgain()
+
+rate = rospy.Rate(100)
+while not rospy.is_shutdown():
+	plotAgain()
+	rate.sleep()
 rospy.spin()
