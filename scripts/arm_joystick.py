@@ -21,7 +21,7 @@ class ArmTeleop:
         ### Initialize the publisher for the joints        
         self.pub_q1 = rospy.Publisher('arm_teleop/joint1', Float64, queue_size=1)
         self.pub_q2 = rospy.Publisher('arm_teleop/joint2', Float64, queue_size=1)
-        self.pub_q3 = rospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
+        self.prospy.Publisher('arm_teleop/joint3', Float64, queue_size=1)
         self.pub_q4 = rospy.Publisher('arm_teleop/joint4', Float64, queue_size=1)
         self.pub_q_string = rospy.Publisher('inverse_kinematics/Q', String, queue_size=1)
         self.joint5 = rospy.Publisher('arm_teleop/joint5', Int32, queue_size=1) #rotation gripper 
