@@ -26,9 +26,11 @@ values_map={
 }
 
 
-buttons, axes = [0,0,0,0,0,0,0], [0,0]
+buttons, axes = [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]
 def to_string():
-    return str(values_map["x"])
+    return str(values_map["x"]) + " " + str(values_map["y"]) + \
+    " " + str(values_map["z"]) + " " + str(values_map["joint4"]) + \
+    str(values_map["joint5"]) + " " + str(values_map["joint8"])
 
 def on_joy(data):
     global buttons, axes
@@ -42,12 +44,12 @@ pub = rospy.Publisher('goal', String, queue_size=1)
 rate = rospy.Rate(20)
 while True:
     changed = False
-    if axes[0] > 0:
+    if axes[0] > 0.01:
         changed = True
-        values_map["x"]+=.5
-    elif axes[0] < 0:
+        values_map["z"]+=.01
+    elif axes[0] < -0.01:
         changed = True
-        values_map["x"]-=.5
+        values_map["z"]-=.01
     else:
         changed = False
         
