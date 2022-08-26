@@ -16,8 +16,9 @@ import numpy
 import cmath
 from sensor_msgs.msg import Joy
 
+
 values_map={   
-    "x": 0,   
+    "x": 0,
     "y": 0,      
     "z": 0,
     "phi": 0,
@@ -57,22 +58,28 @@ def on_joy(data):
 rospy.init_node("arm_joystick")
 rospy.Subscriber("joy",Joy,on_joy)
 pub = rospy.Publisher('goal', String, queue_size=1)
+pub_prism = rospy.Publisher('arm_teleop/prism', Float64, queue_size=1)
+last_prism = 0
+
 rate = rospy.Rate(20)
 
 while True:
     changed = False
-    values_map["x"] = change_value(axes, 0, .1)*-1
-    values_map["y"] = triggers(5)
-    values_map["z"] = change_value(axes, 1, .1)
-    values_map["phi"] = change_value(axes, 4, .5)
-    values_map["rotation"] = change_value(axes, 3, .5)*-1
-    
-    for i in axes:
+    values_map["x"] = triggers(.04)
+    values_map["y"] = change_value(axes, 0, .35)*-1
+    values_map["z"] = change_value(axes, 1, .05)
+    values_map["phi"] = change_value(axes, 4, .8)
+    values_map["rotation"] = change_value(axes, 3, .05)*-1
+    if axes[-1] != last_prism:
+        pub_prism.publish(axes[-1])
+        last_prism = axes[-1]
+    """for i in axes:
         if i !=0:
-            changed = True
+            changed = T<rue
             break
 
     if changed:
-        pub.publish(to_string())
+        pub.publish(to_string())"""
+    pub.publish(to_string())
     rate.sleep()
 rospy.spin()
