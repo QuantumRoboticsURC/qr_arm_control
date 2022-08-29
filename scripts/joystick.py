@@ -54,10 +54,18 @@ def on_joy(data):
     global buttons, axes
     buttons = list(data.buttons [:])
     axes = list(data.axes [:])
-    
+    if buttons[0] == 1:
+        pub_predefined.publish("FLOOR")
+    elif buttons[1] == 1:
+        pub_predefined.publish("HOME")
+    elif buttons[2] == 1:
+        pub_predefined.publish("INTERMEDIATE")
+
+
 rospy.init_node("arm_joystick")
 rospy.Subscriber("joy",Joy,on_joy)
 pub = rospy.Publisher('goal', String, queue_size=1)
+pub_predefined = rospy.Publisher('predefined', String, queue_size=1)
 pub_prism = rospy.Publisher('arm_teleop/prism', Float64, queue_size=1)
 last_prism = 0
 
@@ -65,21 +73,15 @@ rate = rospy.Rate(20)
 
 while True:
     changed = False
-    values_map["x"] = triggers(.04)
-    values_map["y"] = change_value(axes, 0, .35)*-1
+    values_map["x"] = triggers(.02)
+    values_map["y"] = change_value(axes, 0, .22)*-1
     values_map["z"] = change_value(axes, 1, .05)
     values_map["phi"] = change_value(axes, 4, .8)
     values_map["rotation"] = change_value(axes, 3, .05)*-1
     if axes[-1] != last_prism:
         pub_prism.publish(axes[-1])
         last_prism = axes[-1]
-    """for i in axes:
-        if i !=0:
-            changed = T<rue
-            break
-
-    if changed:
-        pub.publish(to_string())"""
+        
     pub.publish(to_string())
     rate.sleep()
 rospy.spin()
