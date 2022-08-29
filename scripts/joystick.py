@@ -71,7 +71,7 @@ last_prism = 0
 
 rate = rospy.Rate(20)
 
-while True:
+while not rospy.is_shutdown():
     changed = False
     values_map["x"] = triggers(.02)
     values_map["y"] = change_value(axes, 0, .22)*-1
@@ -81,7 +81,6 @@ while True:
     if axes[-1] != last_prism:
         pub_prism.publish(axes[-1])
         last_prism = axes[-1]
-        
+
     pub.publish(to_string())
     rate.sleep()
-rospy.spin()

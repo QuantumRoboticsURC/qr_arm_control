@@ -1,0 +1,14 @@
+<launch>
+    <env name="ROSCONSOLE_FORMAT" value="[${severity}][${thread}][${node}/${function}:${line}]: ${message}"/>
+
+    <!-- Joystick Device Argument -->
+    <arg name="joy_dev" default="/dev/input/js1"/>
+<!-- Joy Node -->
+    <node pkg="joy" type="joy_node" name="joy_drive" clear_params="true" output="screen" respawn="true" >
+      <param name="dev" value="$(arg joy_dev)" />
+      <param name="deadzone" value="0.12" />
+      <!-- OUTPUT TOPICS -->
+      <remap from="joy" to="joy" />
+    </node>
+<node name="arm_joystick" pkg="qr_arm_control" type="joystick.py" output="screen"></node>
+</launch>
