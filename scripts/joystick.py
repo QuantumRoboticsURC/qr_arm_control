@@ -97,10 +97,10 @@ rate = rospy.Rate(20)
 while not rospy.is_shutdown():
     pause()
     changed = False
-    values_map["x"] = change_value(axes,2,.02)*-1
-    values_map["y"] = change_value(axes, 0, .22)*-1
+    values_map["x"] = change_value(axes,3,.02)*-1
+    values_map["y"] = change_value(axes, 4, .22)
     values_map["z"] = change_value(axes, 1, .05)
-    values_map["phi"] = change_value(axes, 5, .8)
+    values_map["phi"] = change_value2(axes,5, 5, .8)
     #values_map["rotation"] = change_value2(axes, 4,3, .05)
     values_map["joint5"]=servo_mover(6)
     values_map["joint8"]=servo_mover(7)
