@@ -24,8 +24,9 @@ values_map={
     "y": 0,      
     "z": 0,
     "phi": 0,
-    "joint5":0,
-    "joint8":0
+    "servo":0,
+    "joint8":0,
+    "gripper":0
 }
 
 def change_value(arr, index, val):
@@ -57,7 +58,7 @@ buttons, axes = [0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]
 def to_string():
     print(values_map)
     return str(values_map["x"]) + " " + str(values_map["y"]) + \
-    " " + str(values_map["z"]) + " " + str(values_map["phi"]) +" "+str(values_map["joint5"])+" "+str(values_map["joint8"])
+    " " + str(values_map["z"]) + " " + str(values_map["phi"]) +" "+str(values_map["servo"])+" "+str(values_map["joint8"])+" "+str(values_map["gripper"])
 
 def on_joy(data):
     global buttons, axes
@@ -97,12 +98,13 @@ rate = rospy.Rate(20)
 while not rospy.is_shutdown():
     pause()
     changed = False
-    values_map["x"] = change_value(axes,3,.02)*-1
-    values_map["y"] = change_value(axes, 4, .22)
+    values_map["x"] = change_value(axes,0,.02)*-1
+    values_map["y"] = change_value(axes, 3, .22)
     values_map["z"] = change_value(axes, 1, .05)
     values_map["phi"] = change_value2(axes,5, 5, .8)
+    values_map["gripper"]=change_value2(axes,4,2,1)
     #values_map["rotation"] = change_value2(axes, 4,3, .05)
-    values_map["joint5"]=servo_mover(6)
+    values_map["servo"]=servo_mover(6)
     values_map["joint8"]=servo_mover(7)
     if axes[-1] != last_prism:
         pub_prism.publish(axes[-1])
