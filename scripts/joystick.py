@@ -55,15 +55,19 @@ def triggers(val):
     
         
 buttons, axes = [0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]
+user = ""
 def to_string():
     print(values_map)
     return str(values_map["x"]) + " " + str(values_map["y"]) + \
     " " + str(values_map["z"]) + " " + str(values_map["phi"]) +" "+str(values_map["servo"])+" "+str(values_map["joint8"])+" "+str(values_map["gripper"])
 
 def on_joy(data):
-    global buttons, axes
+    global buttons, axes, user
     buttons = list(data.buttons [:])
     axes = list(data.axes [:])
+    user=str(data.header).split(" ")[len(str(data.header).split(" "))-1].split("/")[3]
+    
+    
    
     if buttons[0] == 1:
         pub_predefined.publish("FLOOR")
@@ -96,19 +100,20 @@ last_prism = 0
 rate = rospy.Rate(20)
 
 while not rospy.is_shutdown():
-    pause()
-    changed = False
-    values_map["x"] = change_value(axes,0,.02)*-1
-    values_map["y"] = change_value(axes, 3, .22)
-    values_map["z"] = change_value(axes, 1, .05)
-    values_map["phi"] = change_value2(axes,5, 5, .8)
-    values_map["gripper"]=change_value2(axes,4,2,1)
-    #values_map["rotation"] = change_value2(axes, 4,3, .05)
-    values_map["servo"]=servo_mover(6)
-    values_map["joint8"]=servo_mover(7)
-    if axes[-1] != last_prism:
-        pub_prism.publish(axes[-1])
-        last_prism = axes[-1]
+    if(user=="js1"):
+        pause()
+        changed = False
+        values_map["x"] = change_value(axes,0,.02)*-1
+        values_map["y"] = change_value(axes, 3, .22)*-1
+        values_map["z"] = change_value(axes, 1, .05)
+        values_map["phi"] = change_value2(axes,5, 5, .8)
+        values_map["gripper"]=change_value2(axes,4,2,1)
+        #values_map["rotation"] = change_value2(axes, 4,3, .05)
+        values_map["servo"]=servo_mover(6)
+        values_map["joint8"]=servo_mover(7)
+        if axes[-1] != last_prism:
+            pub_prism.publish(axes[-1])
+            last_prism = axes[-1]
 
-    pub.publish(to_string())
-    rate.sleep()
+        pub.publish(to_string())
+        rate.sleep()
